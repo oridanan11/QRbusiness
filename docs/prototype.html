@@ -1,0 +1,363 @@
+<title>כרטיס בכיס</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Hebrew:wght@400;500;600;700&family=Suez+One&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+/* Layout: editor column + sticky phone-sized card preview; stacks on phones (card first) */
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --fg:#151821; --muted:#5E6676; --line:#E1E5EC;
+  --ui:#2340B8; --ui-soft:#E8EDFB; --ok:#0E8A5F;
+  --brand:#2340B8;
+  --display:"Suez One","IBM Plex Sans Hebrew",Georgia,serif;
+  --body:"IBM Plex Sans Hebrew",system-ui,"Segoe UI",Arial,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1218; --surface:#181C25; --fg:#ECEFF5; --muted:#9AA3B5; --line:#2A3040;
+  --ui:#7E98FF; --ui-soft:#1F2740; --ok:#3CC58F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1218; --surface:#181C25; --fg:#ECEFF5; --muted:#9AA3B5; --line:#2A3040;
+  --ui:#7E98FF; --ui-soft:#1F2740; --ok:#3CC58F; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55;direction:rtl;padding:0 16px}
+.wrap{max-width:1080px;margin:0 auto;padding-block:28px 48px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:38px;height:38px;border-radius:10px;background:var(--ui);display:grid;place-items:center}
+.logo h1{font-family:var(--display);font-weight:400;font-size:26px;margin:0;line-height:1}
+.logo p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.free{font-size:12px;font-weight:600;color:var(--ok);border:1px solid currentColor;border-radius:999px;padding:3px 10px;letter-spacing:.02em}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:28px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}.preview-col{order:-1}}
+
+/* editor */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.panel+.panel{margin-top:16px}
+.panel h2{font-size:15px;margin:0 0 4px;font-weight:700}
+.panel .sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:520px){.fields{grid-template-columns:1fr}}
+.f{display:flex;flex-direction:column;gap:5px;min-width:0}
+.f.full{grid-column:1/-1}
+.f label{font-size:13px;font-weight:600}
+.f small{color:var(--muted);font-size:12px}
+input[type=text],input[type=tel],input[type=email],input[type=url],textarea{
+  font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+textarea{resize:vertical;min-height:64px}
+input:focus,textarea:focus{outline:2px solid var(--ui);outline-offset:1px;border-color:transparent}
+input[dir=ltr]{text-align:left}
+
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.sw{width:34px;height:34px;border-radius:50%;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.sw[aria-pressed=true]{box-shadow:0 0 0 2px var(--fg)}
+.sw:focus-visible{outline:2px solid var(--ui);outline-offset:3px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-weight:600;font-size:14px;border-radius:10px;padding:10px 16px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.btn:hover{border-color:var(--ui)}
+.btn.primary{background:var(--ui);color:#fff;border-color:var(--ui)}
+.btn:focus-visible{outline:2px solid var(--ui);outline-offset:2px}
+.upload{display:flex;align-items:center;gap:12px}
+.upload .thumb{width:48px;height:48px;border-radius:50%;background:var(--bg);border:1px dashed var(--line);display:grid;place-items:center;overflow:hidden;color:var(--muted);font-size:11px}
+.upload .thumb img{width:100%;height:100%;object-fit:cover}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+.note{font-size:12.5px;color:var(--muted);background:var(--ui-soft);border-radius:10px;padding:10px 12px;margin-top:14px}
+
+/* preview */
+.preview-col{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px)}
+.ex-tag{font-size:12px;color:var(--muted);text-align:center;margin-bottom:10px}
+.card{background:var(--surface);border-radius:24px;overflow:hidden;border:1px solid var(--line);box-shadow:0 18px 40px -24px rgba(20,30,60,.35)}
+.cover{height:110px;background:var(--brand);position:relative;overflow:hidden}
+.cover::after{content:"";position:absolute;inset:0;background:
+  radial-gradient(circle at 15% 120%,rgba(255,255,255,.22) 0 60px,transparent 61px),
+  radial-gradient(circle at 92% -30%,rgba(255,255,255,.16) 0 90px,transparent 91px)}
+.avatar{width:96px;height:96px;border-radius:50%;margin:-50px auto 0;position:relative;z-index:1;border:4px solid var(--surface);background:var(--brand);display:grid;place-items:center;overflow:hidden;color:#fff;font-family:var(--display);font-size:36px}
+.avatar img{width:100%;height:100%;object-fit:cover;background:#fff}
+.who{text-align:center;padding:10px 20px 4px}
+.who .name{font-family:var(--display);font-size:26px;line-height:1.15;margin:0;text-wrap:balance;overflow-wrap:anywhere}
+.who .role{color:var(--muted);margin:4px 0 0;font-size:14px}
+.who .biz{display:inline-block;margin-top:8px;font-weight:600;font-size:13px;color:color-mix(in srgb,var(--brand) 75%,var(--fg));background:color-mix(in srgb,var(--brand) 14%,transparent);padding:3px 12px;border-radius:999px}
+.who .about{font-size:13.5px;color:var(--fg);margin:12px 0 0;opacity:.85}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:18px 18px 6px}
+.act{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--fg);font-size:12.5px;font-weight:500;padding:10px 4px;border-radius:12px;background:var(--bg);border:1px solid var(--line);min-width:0}
+.act:hover{border-color:var(--brand)}
+.act .ic{width:38px;height:38px;border-radius:50%;background:var(--brand);display:grid;place-items:center}
+.act svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.details{padding:8px 18px 4px;display:flex;flex-direction:column}
+.det{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.det:last-child{border-bottom:0}
+.det span:first-child{color:var(--muted)}
+.det span:last-child{font-weight:500;overflow-wrap:anywhere;text-align:left}
+.qr-box{margin:12px 18px 18px;padding:16px;border-radius:16px;background:var(--bg);display:flex;gap:14px;align-items:center}
+.qr-box img{width:118px;height:118px;border-radius:8px;background:#fff;padding:6px;flex:none}
+.qr-box .qtxt{min-width:0}
+.qr-box b{display:block;font-size:14px}
+.qr-box small{color:var(--muted);font-size:12.5px;display:block;margin-top:2px}
+.seg{display:inline-flex;margin-top:10px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{font:inherit;font-size:12px;padding:5px 10px;border:0;background:var(--surface);color:var(--fg);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--brand);color:#fff}
+.under{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.under .btn{flex:1;min-width:140px}
+.toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:9}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.big-qr{display:none;margin-top:14px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.big-qr.open{display:block}
+.big-qr img{width:260px;max-width:100%;background:#fff;padding:10px;border-radius:12px}
+.big-qr p{color:var(--muted);font-size:13px;margin:8px 0 0}
+textarea.copyfall{margin-top:10px;font-size:12px}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="logo">
+      <div class="logo-mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.8-1.4 1.8-2 3-2s2.2.6 3 2M15 10h3M15 13h3"/></svg>
+      </div>
+      <div>
+        <h1>כרטיס בכיס</h1>
+        <p>כרטיס ביקור דיגיטלי עם QR, מוכן תוך דקה</p>
+      </div>
+    </div>
+    <span class="free">חינם, בלי הרשמה</span>
+  </header>
+
+  <div class="grid">
+    <!-- EDITOR -->
+    <div>
+      <section class="panel">
+        <h2>הפרטים שלך</h2>
+        <p class="sub">כל שינוי מופיע מיד בכרטיס. הפרטים נשמרים רק במכשיר שלך.</p>
+        <div class="fields">
+          <div class="f"><label for="name">שם מלא</label><input id="name" type="text" autocomplete="name"></div>
+          <div class="f"><label for="role">תפקיד</label><input id="role" type="text"></div>
+          <div class="f full"><label for="biz">שם העסק</label><input id="biz" type="text"></div>
+          <div class="f"><label for="phone">טלפון</label><input id="phone" type="tel" dir="ltr" placeholder="050-0000000"></div>
+          <div class="f"><label for="wa">וואטסאפ</label><input id="wa" type="tel" dir="ltr" placeholder="ריק = אותו מספר"><small>אם ריק, משתמשים בטלפון</small></div>
+          <div class="f"><label for="email">מייל</label><input id="email" type="email" dir="ltr"></div>
+          <div class="f"><label for="site">אתר</label><input id="site" type="url" dir="ltr" placeholder="www.example.co.il"></div>
+          <div class="f"><label for="ig">אינסטגרם</label><input id="ig" type="text" dir="ltr" placeholder="@username"></div>
+          <div class="f"><label for="addr">כתובת</label><input id="addr" type="text"><small>יוצר כפתור ניווט ב-Waze</small></div>
+          <div class="f full"><label for="about">משפט על העסק</label><textarea id="about" maxlength="140"></textarea><small>עד 140 תווים</small></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>עיצוב</h2>
+        <p class="sub">צבע המותג ולוגו או תמונה</p>
+        <div class="fields">
+          <div class="f full">
+            <label id="swl">צבע</label>
+            <div class="swatches" role="group" aria-labelledby="swl" id="swatches"></div>
+          </div>
+          <div class="f full">
+            <label for="logo">לוגו או תמונה</label>
+            <div class="upload">
+              <div class="thumb" id="thumb">אין</div>
+              <label class="btn" for="logo" style="font-weight:600">העלאת תמונה</label>
+              <input id="logo" type="file" accept="image/*">
+              <button class="btn" id="rmLogo" type="button" hidden>הסרה</button>
+            </div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:18px">
+          <button class="btn" id="clear" type="button">ניקוי והתחלה מאפס</button>
+          <button class="btn" id="sample" type="button">טעינת דוגמה</button>
+        </div>
+        <div class="note" id="exNote">מוצגת כרגע דוגמה (מספרה בדויה). החליפו את הפרטים בשלכם.</div>
+      </section>
+    </div>
+
+    <!-- PREVIEW -->
+    <aside class="preview-col">
+      <div class="ex-tag">ככה הכרטיס נראה בטלפון</div>
+      <article class="card" id="card">
+        <div class="cover"></div>
+        <div class="avatar" id="pAvatar"></div>
+        <div class="who">
+          <h2 class="name" id="pName"></h2>
+          <p class="role" id="pRole"></p>
+          <span class="biz" id="pBiz"></span>
+          <p class="about" id="pAbout"></p>
+        </div>
+        <div class="actions" id="pActions"></div>
+        <div class="details" id="pDetails"></div>
+        <div class="qr-box">
+          <img id="qrImg" alt="קוד QR">
+          <div class="qtxt">
+            <b id="qrTitle">סרקו ושמרו אותי</b>
+            <small id="qrSub">סריקה במצלמה מוסיפה את איש הקשר לטלפון</small>
+            <div class="seg" role="group" aria-label="סוג QR">
+              <button type="button" data-q="vcard" aria-pressed="true">איש קשר</button>
+              <button type="button" data-q="wa" aria-pressed="false">וואטסאפ</button>
+            </div>
+          </div>
+        </div>
+      </article>
+      <div class="under">
+        <button class="btn primary" id="copyTxt" type="button">העתקת הכרטיס כטקסט</button>
+        <button class="btn" id="bigQr" type="button">QR גדול להדפסה</button>
+      </div>
+      <div class="big-qr" id="bigQrBox">
+        <img id="bigQrImg" alt="קוד QR גדול">
+        <p>לחיצה ימנית (או לחיצה ארוכה בטלפון) ← שמירת תמונה. מתאים למדבקה על הדלפק או לפלייר.</p>
+      </div>
+      <textarea class="copyfall" id="copyFall" rows="6" hidden readonly></textarea>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  var COLORS=["#2340B8","#0E7C66","#C2410C","#B4235A","#6B2FD1","#1E2430"];
+  var SAMPLE={name:"נועה לוי",role:"מעצבת שיער ובעלים",biz:"סטודיו נועה",phone:"050-1234567",wa:"",email:"noa@studio-noa.co.il",site:"www.studio-noa.co.il",ig:"@studio.noa",addr:"דיזנגוף 120, תל אביב",about:"תספורות, צבע ותסרוקות כלה. קובעים תור בוואטסאפ, תשובה תוך שעה.",color:"#B4235A",logo:"",sample:true};
+  var KEYS=["name","role","biz","phone","wa","email","site","ig","addr","about"];
+  var state={}, qrMode="vcard";
+  var $=function(id){return document.getElementById(id)};
+
+  function load(){try{var s=JSON.parse(localStorage.getItem("kartis")||"null");if(s&&typeof s==="object")return s}catch(e){}return null}
+  function save(){try{localStorage.setItem("kartis",JSON.stringify(state))}catch(e){}}
+
+  // phone helpers
+  function digits(s){return (s||"").replace(/[^\d+]/g,"")}
+  function intl(s){var d=digits(s);if(!d)return"";if(d[0]==="+")return d;if(d.indexOf("00")===0)return "+"+d.slice(2);if(d[0]==="0")return "+972"+d.slice(1);return "+"+d}
+  function waNum(){return intl(state.wa||state.phone).replace("+","")}
+  function siteUrl(){var s=(state.site||"").trim();if(!s)return"";return /^https?:\/\//i.test(s)?s:"https://"+s}
+  function siteShow(){return (state.site||"").replace(/^https?:\/\//i,"").replace(/\/$/,"")}
+  function igHandle(){return (state.ig||"").trim().replace(/^@/,"").replace(/^https?:\/\/(www\.)?instagram\.com\//i,"").replace(/\/.*$/,"")}
+
+  var ICONS={
+    call:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+    wa:'<path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.6z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-1.8-1.8l.8-1-1-2z"/>',
+    mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+    web:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+    ig:'<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6"/>',
+    nav:'<path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>'
+  };
+  function act(href,icon,label){
+    var a=document.createElement("a");a.className="act";a.href=href;a.target="_blank";a.rel="noopener";
+    a.innerHTML='<span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[icon]+'</svg></span>';
+    var t=document.createElement("span");t.textContent=label;a.appendChild(t);return a;
+  }
+  function det(k,v){var d=document.createElement("div");d.className="det";var a=document.createElement("span");a.textContent=k;var b=document.createElement("span");b.textContent=v;b.dir="auto";d.append(a,b);return d}
+  function initials(n){var p=(n||"").trim().split(/\s+/).filter(Boolean);return p.length?(p[0][0]+(p[1]?p[1][0]:"")):"?"}
+
+  function vcard(){
+    var p=(state.name||"").trim().split(/\s+/),first=p.shift()||"",last=p.join(" ");
+    var esc=function(s){return (s||"").replace(/\\/g,"\\\\").replace(/([,;])/g,"\\$1").replace(/\n/g,"\\n")};
+    var L=["BEGIN:VCARD","VERSION:3.0","N:"+esc(last)+";"+esc(first)+";;;","FN:"+esc(state.name)];
+    if(state.biz)L.push("ORG:"+esc(state.biz));
+    if(state.role)L.push("TITLE:"+esc(state.role));
+    if(state.phone)L.push("TEL;TYPE=CELL:"+intl(state.phone));
+    if(state.email)L.push("EMAIL:"+state.email.trim());
+    if(siteUrl())L.push("URL:"+siteUrl());
+    if(state.addr)L.push("ADR;TYPE=WORK:;;"+esc(state.addr)+";;;;");
+    if(igHandle())L.push("X-SOCIALPROFILE;TYPE=instagram:https://instagram.com/"+igHandle());
+    L.push("END:VCARD");return L.join("\n");
+  }
+  function qrData(){
+    if(qrMode==="wa"&&waNum()) return "https://wa.me/"+waNum()+"?text="+encodeURIComponent("היי "+((state.name||"").split(" ")[0]||"")+", הגעתי מהכרטיס הדיגיטלי שלך");
+    return vcard();
+  }
+  function qrImage(text,size,color){
+    if(typeof qrcode!=="function")return "";
+    qrcode.stringToBytes=qrcode.stringToBytesFuncs["UTF-8"];
+    var q=qrcode(0,"M");q.addData(text,"Byte");q.make();
+    var n=q.getModuleCount(),m=4,cell=Math.floor(size/(n+m*2)),dim=cell*(n+m*2);
+    var c=document.createElement("canvas");c.width=c.height=dim;var x=c.getContext("2d");
+    x.fillStyle="#fff";x.fillRect(0,0,dim,dim);x.fillStyle=color;
+    for(var r=0;r<n;r++)for(var k=0;k<n;k++)if(q.isDark(r,k))x.fillRect((k+m)*cell,(r+m)*cell,cell,cell);
+    return c.toDataURL("image/png");
+  }
+  function darkEnough(hex){var n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return (r*299+g*587+b*114)/1000<150}
+
+  function render(){
+    var color=state.color||COLORS[0];
+    $("card").style.setProperty("--brand",color);
+    $("pName").textContent=state.name||"השם שלך";
+    $("pRole").textContent=state.role||"";$("pRole").hidden=!state.role;
+    $("pBiz").textContent=state.biz||"";$("pBiz").hidden=!state.biz;
+    $("pAbout").textContent=state.about||"";$("pAbout").hidden=!state.about;
+    var av=$("pAvatar");av.innerHTML="";
+    if(state.logo){var im=new Image();im.src=state.logo;im.alt="";av.appendChild(im)}else av.textContent=initials(state.name);
+    var th=$("thumb");th.innerHTML="";if(state.logo){var i2=new Image();i2.src=state.logo;i2.alt="";th.appendChild(i2)}else th.textContent="אין";
+    $("rmLogo").hidden=!state.logo;
+
+    var A=$("pActions");A.innerHTML="";
+    if(state.phone)A.appendChild(act("tel:"+intl(state.phone),"call","חיוג"));
+    if(waNum())A.appendChild(act("https://wa.me/"+waNum(),"wa","וואטסאפ"));
+    if(state.email)A.appendChild(act("mailto:"+state.email.trim(),"mail","מייל"));
+    if(siteUrl())A.appendChild(act(siteUrl(),"web","אתר"));
+    if(igHandle())A.appendChild(act("https://instagram.com/"+igHandle(),"ig","אינסטגרם"));
+    if(state.addr)A.appendChild(act("https://waze.com/ul?q="+encodeURIComponent(state.addr)+"&navigate=yes","nav","ניווט"));
+    A.hidden=!A.children.length;
+
+    var D=$("pDetails");D.innerHTML="";
+    if(state.phone)D.appendChild(det("טלפון",state.phone));
+    if(state.email)D.appendChild(det("מייל",state.email));
+    if(siteShow())D.appendChild(det("אתר",siteShow()));
+    if(state.addr)D.appendChild(det("כתובת",state.addr));
+    D.hidden=!D.children.length;
+
+    if(qrMode==="wa"&&!waNum())qrMode="vcard";
+    document.querySelectorAll(".seg button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.q===qrMode))});
+    $("qrTitle").textContent=qrMode==="wa"?"סרקו ודברו איתי":"סרקו ושמרו אותי";
+    $("qrSub").textContent=qrMode==="wa"?"סריקה פותחת שיחת וואטסאפ עם הודעה מוכנה":"סריקה במצלמה מוסיפה את איש הקשר לטלפון";
+    var qc=darkEnough(color)?color:"#151821";
+    $("qrImg").src=qrImage(qrData(),236,qc);
+    if($("bigQrBox").classList.contains("open"))$("bigQrImg").src=qrImage(qrData(),900,qc);
+
+    document.querySelectorAll(".sw").forEach(function(s){s.setAttribute("aria-pressed",String(s.dataset.c===color))});
+    $("exNote").hidden=!state.sample;
+  }
+
+  function fill(){KEYS.forEach(function(k){$(k).value=state[k]||""})}
+  KEYS.forEach(function(k){$(k).addEventListener("input",function(e){state[k]=e.target.value;state.sample=false;render();save()})});
+
+  COLORS.forEach(function(c){var b=document.createElement("button");b.type="button";b.className="sw";b.style.background=c;b.dataset.c=c;b.setAttribute("aria-label","צבע "+c);
+    b.onclick=function(){state.color=c;render();save()};$("swatches").appendChild(b)});
+
+  $("logo").addEventListener("change",function(e){
+    var f=e.target.files&&e.target.files[0];if(!f)return;
+    var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){
+      var s=256,c=document.createElement("canvas");c.width=c.height=s;var x=c.getContext("2d");
+      var m=Math.min(img.width,img.height);x.fillStyle="#fff";x.fillRect(0,0,s,s);
+      x.drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,s,s);
+      state.logo=c.toDataURL("image/jpeg",.85);state.sample=false;render();save();toast("התמונה עודכנה")};
+      img.onerror=function(){toast("לא הצלחנו לקרוא את הקובץ. נסו JPG או PNG")};img.src=rd.result};
+    rd.readAsDataURL(f);e.target.value="";
+  });
+  $("rmLogo").onclick=function(){state.logo="";render();save()};
+  $("clear").onclick=function(){state={color:state.color||COLORS[0],sample:false};fill();render();save();$("name").focus()};
+  $("sample").onclick=function(){state=JSON.parse(JSON.stringify(SAMPLE));fill();render();save()};
+  document.querySelectorAll(".seg button").forEach(function(b){b.onclick=function(){
+    if(b.dataset.q==="wa"&&!waNum()){toast("צריך להזין טלפון או וואטסאפ");return}qrMode=b.dataset.q;render()}});
+  $("bigQr").onclick=function(){var box=$("bigQrBox");box.classList.toggle("open");$("bigQr").textContent=box.classList.contains("open")?"הסתרת QR גדול":"QR גדול להדפסה";render()};
+
+  function cardText(){
+    var L=[];if(state.name)L.push("*"+state.name+"*");
+    var rb=[state.role,state.biz].filter(Boolean).join(" | ");if(rb)L.push(rb);
+    if(state.about)L.push("",state.about);L.push("");
+    if(state.phone)L.push("📞 "+state.phone);
+    if(waNum())L.push("💬 https://wa.me/"+waNum());
+    if(state.email)L.push("✉️ "+state.email);
+    if(siteUrl())L.push("🌐 "+siteUrl());
+    if(igHandle())L.push("📷 https://instagram.com/"+igHandle());
+    if(state.addr)L.push("📍 "+state.addr+" | https://waze.com/ul?q="+encodeURIComponent(state.addr));
+    return L.join("\n");
+  }
+  $("copyTxt").onclick=function(){
+    var t=cardText(),fb=$("copyFall");
+    var fall=function(){fb.hidden=false;fb.value=t;fb.focus();fb.select();toast("סמנו והעתיקו את הטקסט")};
+    try{navigator.clipboard.writeText(t).then(function(){fb.hidden=true;toast("הועתק! הדביקו בוואטסאפ")},fall)}catch(e){fall()}
+  };
+  var tt;function toast(m){var el=$("toast");el.textContent=m;el.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){el.classList.remove("show")},2200)}
+
+  state=load()||JSON.parse(JSON.stringify(SAMPLE));
+  fill();render();
+  window.__kartis={vcard:vcard,qrData:qrData};
+})();
+</script>
