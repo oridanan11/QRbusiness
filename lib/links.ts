@@ -5,6 +5,13 @@ export const GROWWITHU_URL =
 export const GROWWITHU_BUILDER_URL =
   "https://growwithu.net?utm_source=kartis-bakis&utm_medium=builder&utm_campaign=lead-magnet";
 
+/**
+ * כפתור "השאירו פרטים": מוביל לאזור יצירת הקשר בעמוד הבית של הסטודיו.
+ * פרמטרי ה-UTM חייבים לבוא לפני ה-# (החלק שאחרי # לא נשלח לשרת ולא מגיע לאנליטיקס).
+ */
+export const GROWWITHU_CONTACT_URL =
+  "https://growwithu.net/?utm_source=kartis-bakis&utm_medium=builder&utm_campaign=lead-magnet#contact";
+
 const PLACEHOLDER_NUMBER = "972500000000";
 
 /**
