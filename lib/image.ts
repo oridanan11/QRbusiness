@@ -37,3 +37,26 @@ export function processLogo(file: File): Promise<LogoPair> {
     img.src = url;
   });
 }
+
+/**
+ * ממיר תמונה כלשהי (למשל ה-WebP הקטן שמגיע בקישור) ל-JPEG, כי אפליקציות
+ * אנשי קשר לא תומכות ב-WebP בקובץ vcf. אם ההמרה נכשלת מחזיר מחרוזת ריקה.
+ */
+export function toJpegDataUrl(dataUrl: string): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = img.width;
+      c.height = img.height;
+      const x = c.getContext("2d");
+      if (!x) return resolve("");
+      x.fillStyle = "#fff";
+      x.fillRect(0, 0, c.width, c.height);
+      x.drawImage(img, 0, 0);
+      resolve(c.toDataURL("image/jpeg", 0.9));
+    };
+    img.onerror = () => resolve("");
+    img.src = dataUrl;
+  });
+}

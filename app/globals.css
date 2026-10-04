@@ -607,13 +607,13 @@ input[dir="ltr"] {
 .card[data-t="bold"] .top {
   background: var(--brand);
   color: var(--on-brand);
-  padding-bottom: 22px;
+  padding-block: 26px 22px;
 }
 .card[data-t="bold"] .cover {
   display: none;
 }
 .card[data-t="bold"] .avatar {
-  margin: 26px auto 0;
+  margin: 0 auto;
   border-color: color-mix(in srgb, var(--on-brand) 35%, transparent);
 }
 .card[data-t="bold"] .who .name,
@@ -730,4 +730,66 @@ textarea.copyfall {
     scroll-behavior: auto !important;
     animation: none !important;
   }
+}
+
+/* עמוד הכרטיס הציבורי /c */
+.pub {
+  max-width: 440px;
+  margin: 0 auto;
+  padding-block: 24px 40px;
+}
+.pub .loading {
+  padding: 80px 0;
+}
+.pub-actions {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pub-actions .btn {
+  width: 100%;
+}
+.pub-actions .note {
+  margin-top: 0;
+}
+.pub-foot {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+.pub-foot a {
+  color: var(--muted);
+  text-underline-offset: 3px;
+}
+.pub-foot a:hover {
+  color: var(--fg);
+}
+.pub-foot a:focus-visible {
+  outline: 2px solid var(--ui);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.pub-foot .gwu {
+  font-size: 12px;
+  opacity: 0.85;
+}
+.broken {
+  text-align: center;
+  padding: 32px 22px;
+}
+.broken h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 24px;
+  margin: 0 0 8px;
+}
+.broken p {
+  color: var(--muted);
+  margin: 0 0 20px;
 }

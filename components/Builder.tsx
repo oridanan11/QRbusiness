@@ -287,6 +287,9 @@ export function Builder() {
                   <a className="btn" href={waShare} target="_blank" rel="noopener noreferrer">
                     שליחה בוואטסאפ
                   </a>
+                  <a className="btn" href={link.url} target="_blank" rel="noopener noreferrer">
+                    פתיחת הכרטיס
+                  </a>
                 </div>
                 <small>אורך הקישור: {link.url.length} תווים (מתחת ל-{MAX_LINK})</small>
                 {link.logoDropped && (

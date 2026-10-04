@@ -13,6 +13,7 @@ import {
   waNum,
 } from "@/lib/card";
 import { downloadBlob } from "@/lib/download";
+import { toJpegDataUrl } from "@/lib/image";
 import { qrDataUrl } from "@/lib/qr";
 import type { CardData, QrMode } from "@/lib/types";
 import { Icon } from "./Icon";
@@ -46,12 +47,17 @@ export function CardView({ data, qrMode, onQrMode, onToast }: Props) {
   if (siteShow(data)) details.push(["אתר", siteShow(data)]);
   if (data.addr.trim()) details.push(["כתובת", data.addr.trim()]);
 
-  function saveContact() {
+  async function saveContact() {
     if (!data.name.trim()) {
       onToast("הוסיפו שם כדי לשמור איש קשר");
       return;
     }
-    const blob = new Blob([buildVcard(data, { photo: true })], {
+    // בכרטיס הציבורי התמונה מגיעה כ-WebP קטן. ל-vcf צריך JPEG
+    let withPhoto = data;
+    if (data.logo && !data.logo.startsWith("data:image/jpeg")) {
+      withPhoto = { ...data, logo: await toJpegDataUrl(data.logo) };
+    }
+    const blob = new Blob([buildVcard(withPhoto, { photo: true })], {
       type: "text/vcard;charset=utf-8",
     });
     downloadBlob(blob, fileSafe(data.name) + ".vcf");

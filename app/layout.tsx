@@ -20,11 +20,14 @@ export const metadata: Metadata = {
   title: "כרטיס בכיס - כרטיס ביקור דיגיטלי חינם",
   description:
     "בונים כרטיס ביקור דיגיטלי עם קוד QR, כפתורי וואטסאפ וניווט, וקישור אישי לשליחה ללקוחות. חינם, בלי הרשמה, והפרטים נשארים אצלכם.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "כרטיס בכיס", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  themeColor: "#2340b8",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
