@@ -793,3 +793,43 @@ textarea.copyfall {
   color: var(--muted);
   margin: 0 0 20px;
 }
+
+/* אזור הצעה עדין לסטודיו, בתחתית הבונה */
+.promo {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+  padding: 20px 22px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+}
+.promo h2 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+}
+.promo p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.promo-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+@media (max-width: 520px) {
+  .promo-actions {
+    width: 100%;
+  }
+  .promo-actions .btn {
+    flex: 1;
+  }
+  .promo-actions .btn.primary {
+    flex: 2;
+  }
+}

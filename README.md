@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# כרטיס בכיס
 
-## Getting Started
+מחולל חינמי של כרטיסי ביקור דיגיטליים לבעלי עסקים קטנים בישראל. ממלאים פרטים, רואים את הכרטיס מתעדכן בזמן אמת, ומקבלים קישור אישי, קוד QR וקובץ איש קשר (vcf) לשליחה ללקוחות.
 
-First, run the development server:
+הכלי נבנה על ידי הסטודיו GrowWithU ומשמש גם כדרך להכיר אותנו.
+
+## הרצה מקומית
+צריך Node.js מותקן. בטרמינל, בתיקיית הפרויקט:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install     # פעם אחת, מוריד את החבילות
+npm run dev     # מפעיל את האתר
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+פותחים בדפדפן את http://localhost:3000. לעצירה: Ctrl+C.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+פקודות נוספות:
+- `npm run build` בונה את האתר הסטטי לתיקיית `out`. כדאי להריץ לפני כל העלאה.
+- `npm run lint` בודק את הקוד.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## איך זה עובד
+- **אין שרת ואין מסד נתונים.** האתר סטטי בלבד (`output: "export"`), ולכן האחסון עולה 0 ש"ח.
+- **הנתונים בקישור עצמו.** הקישור האישי הוא `/c#<נתונים דחוסים>`. הנתונים דחוסים עם `lz-string` ונמצאים אחרי ה-`#`, החלק שהדפדפן לא שולח לשום שרת. עמוד `/c` קורא אותם בדפדפן ומציג את הכרטיס.
+- **הפרטים נשמרים רק במכשיר** (localStorage) ובתוך הקישור. שום מידע לא נשלח החוצה.
+- **תמונה בקישור:** נכנסת גרסה קטנה (96px, WebP) רק אם הקישור כולו מתחת ל-8000 תווים. אחרת הקישור נוצר בלי התמונה, ומוצגת הודעה. בקובץ ה-vcf שמורידים התמונה תמיד נכנסת.
+- **קוד QR:** של איש קשר (פרטי קשר בלבד, כדי שיהיה קל לסריקה) או של וואטסאפ. נוצר עם `qrcode-generator`, כולל תמיכה בעברית (UTF-8).
 
-## Learn More
+## משתנה סביבה: מספר הוואטסאפ של הסטודיו
+משתנה סביבה הוא הגדרה שנמצאת מחוץ לקוד, כדי שלא נשמור בקוד (שנמצא ב-GitHub הציבורי) ערכים שמשתנים. כאן יש אחד: `NEXT_PUBLIC_WA_NUMBER`, המספר של כפתור "דברו איתנו בוואטסאפ".
 
-To learn more about Next.js, take a look at the following resources:
+- **פורמט:** ספרות בלבד, בינלאומי, בלי `+` ובלי מקפים. למשל `972501234567`.
+- **מקומית:** מעתיקים את `.env.example` לקובץ בשם `.env.local` ומחליפים את המספר. הקובץ `.env.local` לא עולה ל-GitHub.
+- **ב-Vercel:** בפרויקט נכנסים ל-Settings, אחר כך Environment Variables, מוסיפים `NEXT_PUBLIC_WA_NUMBER` עם המספר, ושומרים. אחר כך צריך לבנות מחדש: Deployments, בשורה האחרונה ללחוץ על שלוש הנקודות ולבחור Redeploy.
+- כל עוד המספר לא הוגדר (או שנשאר מספר המקום-שמור), כפתור הוואטסאפ לא מוצג, וקישור GrowWithU נשאר.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## עדכון והעלאה לאוויר
+האתר מחובר ל-Vercel, וכל `git push` ל-`main` מעלה גרסה חדשה אוטומטית:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+git add -A
+git commit -m "הודעה קצרה על מה שהשתנה"
+git push
+```
 
-## Deploy on Vercel
+אפשר לראות אם הבנייה הצליחה ב-Vercel, בלשונית Deployments של הפרויקט.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## מבנה הפרויקט
+- `app/page.tsx`: עמוד הבנייה. `app/c/page.tsx`: הכרטיס הציבורי.
+- `components/`: הטופס (`Builder`), הכרטיס (`CardView`), עמוד הכרטיס (`PublicCard`) ואזור ההצעה (`StudioPromo`).
+- `lib/`: הלוגיקה. `card.ts` (כפתורים, vCard, טקסט להעתקה), `link.ts` (קידוד וקריאה של הקישור), `qr.ts`, `image.ts`, `storage.ts`.
+- `docs/prototype.html`: אב הטיפוס המקורי. `docs/demo-links.md`: שלושה כרטיסי דמו.

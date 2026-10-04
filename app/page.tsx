@@ -1,4 +1,5 @@
 import { Builder } from "@/components/Builder";
+import { StudioPromo } from "@/components/StudioPromo";
 
 export default function Home() {
   return (
@@ -29,6 +30,7 @@ export default function Home() {
         <span className="free">חינם, בלי הרשמה</span>
       </header>
       <Builder />
+      <StudioPromo />
     </div>
   );
 }
